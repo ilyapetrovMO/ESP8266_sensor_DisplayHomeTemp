@@ -7,7 +7,7 @@
 #include <TimeLib.h>
 #include "secrets.h"
 
-const char server[] { "displayhometemp.herokuapp.com" };
+const char server[] { "" };
 
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, server, 80);
