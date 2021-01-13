@@ -49,7 +49,7 @@ void getAndSendData()
   float temperature = dht.getTemperature();
   
   char data[82] = {0};
-  snprintf(data, sizeof(data), "{\"temperature\":%.1f,\"humidity\":%.1f,\"timestamp\":\"%s\"}",
+  snprintf(data, sizeof(data), "{\"temperature\":%4.1f,\"humidity\":%4.1f,\"timestamp\":\"%s\"}",
            temperature, humidity, buff);
 
   Serial.println(data);
