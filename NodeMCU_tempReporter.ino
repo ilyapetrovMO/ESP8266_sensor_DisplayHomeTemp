@@ -48,6 +48,9 @@ void getAndSendData()
   float humidity = dht.getHumidity();
   float temperature = dht.getTemperature();
   
+  humidity = humidity > 99.f ? 99.f : humidity;
+  temperature = temperature > 99.f ? 99.f : temperature;
+  
   char data[82] = {0};
   snprintf(data, sizeof(data), "{\"temperature\":%4.1f,\"humidity\":%4.1f,\"timestamp\":\"%s\"}",
            temperature, humidity, buff);
