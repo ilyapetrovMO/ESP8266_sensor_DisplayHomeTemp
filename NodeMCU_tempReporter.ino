@@ -7,7 +7,7 @@
 #include <TimeLib.h>
 #include "secrets.h"
 
-const char server[] { "" };
+const char server[] { "XXXXXXXXXXXXXXXXX" };
 
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, server, 80);
@@ -48,8 +48,8 @@ void getAndSendData()
   float humidity = dht.getHumidity();
   float temperature = dht.getTemperature();
   
-  char data[82] = {0};
-  snprintf(data, sizeof(data), "{\"temperature\":%4.1f,\"humidity\":%4.1f,\"timestamp\":\"%s\"}",
+  char data[100] = {0};
+  snprintf(data, sizeof(data), "{\"temperature\":%.1f,\"humidity\":%.1f,\"timestamp\":\"%s\"}",
            temperature, humidity, buff);
 
   Serial.println(data);
@@ -59,7 +59,7 @@ void getAndSendData()
   client.sendHeader("Content-Type", "application/json");
   client.sendHeader("Content-Length", strlen(data));
   client.beginBody();
-  client.print(data);
+  Serial.println(client.print(data));
   client.endRequest();
 
   int statusCode = client.responseStatusCode();
@@ -73,8 +73,9 @@ void getAndSendData()
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
   
-  Serial.begin(115200);
+  Serial.begin(1000000);
   Serial.println();
 
   WiFi.begin(SSID, PASS);
@@ -82,20 +83,27 @@ void setup() {
   Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED)
   {
+    digitalWrite(LED_BUILTIN, LOW);
     delay(500);
+    digitalWrite(LED_BUILTIN, HIGH);
     Serial.print(".");
   }
   Serial.println();
-  blink(3);
 
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
 
   timeClient.begin();
-  dht.setup(2, DHTesp::DHT11);
+  dht.setup(13, DHTesp::DHT11);
+
+  delay(dht.getMinimumSamplingPeriod());
 }
 
 void loop() {
-   getAndSendData();
-   delay(60*60*1000);
+  getAndSendData();
+  Serial.printf("free heap: %d | frag: %d | max block: %d\n\n\n",
+  ESP.getFreeHeap(),
+  ESP.getHeapFragmentation(),
+  ESP.getMaxFreeBlockSize());
+  delay(60*60*1000);
 }
