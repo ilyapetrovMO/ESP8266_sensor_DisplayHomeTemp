@@ -48,9 +48,6 @@ void getAndSendData()
   float humidity = dht.getHumidity();
   float temperature = dht.getTemperature();
   
-  humidity = humidity > 99.f ? 99.f : humidity;
-  temperature = temperature > 99.f ? 99.f : temperature;
-  
   char data[82] = {0};
   snprintf(data, sizeof(data), "{\"temperature\":%4.1f,\"humidity\":%4.1f,\"timestamp\":\"%s\"}",
            temperature, humidity, buff);
@@ -60,7 +57,7 @@ void getAndSendData()
   client.beginRequest();
   client.post("/api/temperature");
   client.sendHeader("Content-Type", "application/json");
-  client.sendHeader("Content-Length", sizeof(data)/sizeof(char)-2); //-2 is something I dont understand
+  client.sendHeader("Content-Length", strlen(data));
   client.beginBody();
   client.print(data);
   client.endRequest();
