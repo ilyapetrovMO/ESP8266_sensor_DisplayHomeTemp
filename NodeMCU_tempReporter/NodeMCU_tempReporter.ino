@@ -40,7 +40,7 @@ void toUtcString(char* buff, size_t size)
          );
 }
 
-void getAndSendData()
+void getAndSendData(int tries, unsigned long delayStep)
 {
   static char buff[30] = {0};
   toUtcString(buff, sizeof(buff));
@@ -53,22 +53,31 @@ void getAndSendData()
            temperature, humidity, buff);
 
   Serial.println(data);
+  
+  unsigned long delaySumm = 0ull;
+  for (int i = 0; i <= tries; i++) {
+    client.beginRequest();
+    client.post("/api/temperature");
+    client.sendHeader("Content-Type", "application/json");
+    client.sendHeader("Content-Length", strlen(data));
+    client.beginBody();
+    Serial.println(client.print(data));
+    client.endRequest();
+  
+    int statusCode = client.responseStatusCode();
+    String response = client.responseBody();
+  
+    Serial.print("Status code: ");
+    Serial.println(statusCode);
+    Serial.print("Response: ");
+    Serial.println(response);
+  
+    if (statusCode == 1) {
+      return;
+    }
 
-  client.beginRequest();
-  client.post("/api/temperature");
-  client.sendHeader("Content-Type", "application/json");
-  client.sendHeader("Content-Length", strlen(data));
-  client.beginBody();
-  Serial.println(client.print(data));
-  client.endRequest();
-
-  int statusCode = client.responseStatusCode();
-  String response = client.responseBody();
-
-  Serial.print("Status code: ");
-  Serial.println(statusCode);
-  Serial.print("Response: ");
-  Serial.println(response);
+    delay(delaySumm + delayStep);
+  }
 }
 
 void setup() {
@@ -98,6 +107,6 @@ void setup() {
 }
 
 void loop() {
-   getAndSendData();
+   getAndSendData(3, 10ull * 60 * 1000);
    delay(60*60*1000);
 }
