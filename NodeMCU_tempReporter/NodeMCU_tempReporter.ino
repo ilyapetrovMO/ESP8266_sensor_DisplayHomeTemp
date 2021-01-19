@@ -107,6 +107,15 @@ void setup() {
 }
 
 void loop() {
-   getAndSendData(3, 10ull * 60 * 1000);
-   delay(60*60*1000);
+  Serial.println("--");
+  
+  getAndSendData(3, 10ull * 60 * 1000);
+  
+  Serial.printf("free heap: %d | frag: %d | max block: %d\n\n\n",
+    ESP.getFreeHeap(),
+    ESP.getHeapFragmentation(),
+    ESP.getMaxFreeBlockSize()
+    );
+  
+  delay(60*60*1000);
 }
