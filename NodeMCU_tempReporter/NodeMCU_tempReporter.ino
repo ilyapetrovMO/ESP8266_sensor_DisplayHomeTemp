@@ -72,7 +72,7 @@ void getAndSendData(int tries, unsigned long delayStep)
     Serial.print("Response: ");
     Serial.println(response);
   
-    if (statusCode == 1) {
+    if (statusCode == 200) {
       return;
     }
 
