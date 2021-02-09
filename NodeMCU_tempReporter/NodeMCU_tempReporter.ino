@@ -12,7 +12,7 @@ const char server[] { "displayhometemp.herokuapp.com" };
 WiFiClient wifi;
 HttpClient client = HttpClient(wifi, server, 80);
 WiFiUDP Udp;
-NTPClient timeClient(Udp);
+NTPClient timeClient(Udp, "europe.pool.ntp.org");
 DHTesp dht;
 
 void blink(int a)
@@ -30,6 +30,8 @@ void toUtcString(char* buff, size_t size)
 {
   timeClient.update();
   unsigned long epoch = timeClient.getEpochTime();
+  Serial.print("epoch - ");
+  Serial.println(epoch);
   
   static const char* days[] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
   static const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
@@ -42,6 +44,11 @@ void toUtcString(char* buff, size_t size)
 
 void getAndSendData(int tries, unsigned long delayStep)
 {
+  Serial.println(WiFi.status());
+  
+  if (WiFi.status() != WL_CONNECTED)
+    WiFi.reconnect();
+  
   static char buff[30] = {0};
   toUtcString(buff, sizeof(buff));
 
@@ -86,6 +93,10 @@ void setup() {
   Serial.begin(1000000);
   Serial.println();
 
+  Serial.print(SSID);
+  Serial.print(' ');
+  Serial.println(PASS);
+
   WiFi.begin(SSID, PASS);
 
   Serial.print("Connecting");
@@ -109,7 +120,7 @@ void setup() {
 void loop() {
   Serial.println("--");
   
-  getAndSendData(3, 10ull * 60 * 1000);
+  getAndSendData(4, 5ull * 1000);
   
   Serial.printf("free heap: %d | frag: %d | max block: %d\n\n\n",
     ESP.getFreeHeap(),

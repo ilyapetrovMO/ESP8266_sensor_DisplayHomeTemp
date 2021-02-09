@@ -1,2 +1,2 @@
-const char SSID[] {""};
-const char PASS[] {""};
+const char SSID[] {"/pol/"};
+const char PASS[] {"226000874888"};
